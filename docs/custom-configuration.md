@@ -46,12 +46,14 @@ Note: Adjust the server machine name to match your project's Search API server.
 */
 if (getenv('IS_DDEV_PROJECT') == 'true') {
  // Override any Pantheon search configuration for DDEV
+ $config['search_api.server.pantheon_solr8']['backend_config']['connector'] = 'standard';"
  $config['search_api.server.pantheon_solr8']['backend_config']['connector_config']['host'] = 'solr';
  $config['search_api.server.pantheon_solr8']['backend_config']['connector_config']['port'] = '8983';
  $config['search_api.server.pantheon_solr8']['backend_config']['connector_config']['path'] = '/';
  $config['search_api.server.pantheon_solr8']['backend_config']['connector_config']['core'] = 'dev';
 
  // Alternative configuration if using different server name
+ $config['search_api.server.solr']['backend_config']['connector'] = 'standard';"
  $config['search_api.server.solr']['backend_config']['connector_config']['host'] = 'solr';
  $config['search_api.server.solr']['backend_config']['connector_config']['port'] = '8983';
  $config['search_api.server.solr']['backend_config']['connector_config']['path'] = '/';
