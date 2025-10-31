@@ -18,14 +18,14 @@ ddev exec "command -v terminus >/dev/null 2>&1 || {
 
 # Authenticate with Pantheon using global token (if available and not already authenticated)
 # The TERMINUS_MACHINE_TOKEN is automatically available from the web container environment
-ddev exec "terminus auth:whoami >/dev/null 2>&1 || {
+ddev exec "if terminus auth:whoami 2>&1 | grep -q 'You are not logged in'; then
     if [ -n \"\${TERMINUS_MACHINE_TOKEN:-}\" ]; then
         terminus auth:login --machine-token=\"\${TERMINUS_MACHINE_TOKEN}\"
     else
         echo 'TERMINUS_MACHINE_TOKEN not set globally. Please run:'
         echo 'ddev config global --web-environment-add=TERMINUS_MACHINE_TOKEN=your_token'
     fi
-}"
+fi"
 
 # Run terminus command
 ddev exec "terminus $*"
