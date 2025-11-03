@@ -151,10 +151,17 @@ refresh_pantheon_database() {
 
     # Download the database backup using terminus if needed
     if [ "$DOWNLOAD_NEW_BACKUP" = true ]; then
-        echo -e "\nDownloading database backup from ${SITE_ENV}..."
-        terminus backup:get ${SITE_ENV} --element=database --to=${DB_DUMP}
+      echo -e "\nDownloading database backup from ${SITE_ENV}..."
+
+      # Remove old dump file if it exists before downloading
+      if [ -f "$DB_DUMP" ]; then
+          echo -e "${yellow}Removing old database dump file...${NC}"
+          rm -f "$DB_DUMP"
+      fi
+
+      terminus backup:get ${SITE_ENV} --element=database --to=${DB_DUMP}
     else
-        echo -e "\nUsing existing local database dump file."
+      echo -e "\nUsing existing local database dump file."
     fi
 
     echo -e "\nReset DB"
