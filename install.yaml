@@ -68,14 +68,6 @@ post_install_actions:
     echo "⚠️  Solr add-on installation failed (likely GitHub API rate limit in CI)"
     echo "   You can install it manually later with: ddev add-on get ddev/ddev-drupal-solr"
   fi
-  echo ""
-  echo "📦 Installing PhpMyAdmin add-on..."
-  if ddev add-on get ddev/ddev-phpmyadmin 2>&1; then
-    echo "✅ PhpMyAdmin add-on installed successfully"
-  else
-    echo "⚠️  PhpMyAdmin add-on installation failed (likely GitHub API rate limit in CI)"
-    echo "   You can install it manually later with: ddev add-on get ddev/ddev-phpmyadmin"
-  fi
   set -e  # Re-enable strict error checking
   echo ""
   echo "Ignore DDEV add-on settings files"
@@ -105,7 +97,6 @@ post_install_actions:
   echo "   • Migration and backup utilities"
   echo "   • Redis add-on for caching"
   echo "   • Solr add-on with DDEV configuration for search functionality"
-  echo "   • PhpMyAdmin for database administration"
   echo "   • Setup xdebug performance profiling.  Can be switched back to normal debugging as well."
   echo ""
   echo "🔧 Next steps:"
@@ -170,14 +161,6 @@ removal_action:
     echo "⚠️ Solr add-on removal failed or not found"
   fi
 
-  # Remove PhpMyAdmin add-on
-  echo "📦 Removing PhpMyAdmin add-on..."
-  if ddev add-on remove ddev-phpmyadmin 2>/dev/null; then
-    echo "✅ PhpMyAdmin add-on removed successfully"
-  else
-    echo "⚠️ PhpMyAdmin add-on removal failed or not found"
-  fi
-
   # Remove all custom commands
   echo "🔧 Removing custom commands..."
 
@@ -189,8 +172,6 @@ removal_action:
   rm -f commands/host/drupal-uli 2>/dev/null || true
   rm -f commands/host/pantheon-terminus 2>/dev/null || true
   rm -f commands/host/pantheon-testenv 2>/dev/null || true
-  rm -f commands/host/phpmyadmin 2>/dev/null || true
-  # project-auth command removed - now using built-in ddev auth ssh
   rm -f commands/host/project-configure 2>/dev/null || true
   rm -f commands/host/project-init 2>/dev/null || true
   rm -f commands/host/project-lefthook 2>/dev/null || true
@@ -230,7 +211,7 @@ removal_action:
 
   echo ""
   echo "✅ Kanopi Drupal Add-on removed successfully!"
-  echo "   • Redis, Solr, and PhpMyAdmin add-ons uninstalled"
+  echo "   • Redis and Solr add-ons uninstalled"
   echo "   • All 27 custom commands removed"
   echo "   • Platform-specific configurations removed (Nginx/Apache)"
   echo "   • Environment variables preserved (remove manually if needed)"

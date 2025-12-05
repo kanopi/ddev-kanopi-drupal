@@ -20,7 +20,7 @@ This add-on provides:
 - **Critical CSS Tools**: Performance optimization with critical path CSS generation
 - **Migration Utilities**: Tools for site migrations and database management
 - **Security & Performance**: Platform-specific configurations and optimization
-- **Services Integration**: PHPMyAdmin, Redis/Memcached, and Solr via official DDEV add-ons
+- **Services Integration**: Redis/Memcached and Solr via official DDEV add-ons
 - **Environment Configuration**: Clean configuration system using environment variables
 
 ## Prerequisites
