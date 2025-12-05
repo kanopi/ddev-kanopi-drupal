@@ -190,7 +190,7 @@ removal_action:
   rm -f commands/host/pantheon-terminus 2>/dev/null || true
   rm -f commands/host/pantheon-testenv 2>/dev/null || true
   rm -f commands/host/phpmyadmin 2>/dev/null || true
-  rm -f commands/host/project-auth 2>/dev/null || true
+  # project-auth command removed - now using built-in ddev auth ssh
   rm -f commands/host/project-configure 2>/dev/null || true
   rm -f commands/host/project-init 2>/dev/null || true
   rm -f commands/host/project-lefthook 2>/dev/null || true

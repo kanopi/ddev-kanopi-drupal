@@ -30,7 +30,7 @@ The DDEV Kanopi Drupal Add-on provides custom commands to streamline local devel
 | `pantheon-terminus`| Run Terminus commands for Pantheon integration                            | `ddev pantheon-terminus site:list`         | —                                                        | Host |
 | `pantheon-tickle`  | Continuously wake up a Pantheon environment.                              | `ddev pantheon-tickle`                     | `pantheon:tickle`, `tickle`                              | Web  |
 | `phpmyadmin`       | Launch a browser with PhpMyAdmin                                          | `ddev phpmyadmin`                          | —                                                        | Host |
-| `project-auth`     | Authorizes you into DDEV.                                                 | `ddev project-auth`                        | `project:auth`                                           | Host |
+| `auth ssh`         | Adds SSH keys to the ddev containers.                                     | `ddev auth ssh`                            | —                                                        | Host |
 | `project-configure`| Interactive configuration wizard for Kanopi Drupal DDEV                   | `ddev project-configure`                   | `configure`, `project:configure`, `prc`                  | Host |
 | `project-init`     | Initialize local development.                                             | `ddev project-init`                        | `project:init`, `init`                                   | Host |
 | `project-lefthook` | Initialize Lefthook.                                                      | `ddev project-lefthook`                    | `project:lefthook`                                       | Host |
