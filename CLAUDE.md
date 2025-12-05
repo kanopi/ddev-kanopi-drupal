@@ -23,7 +23,7 @@ Commands are organized into two categories:
 ### Essential Commands
 - `ddev project-init`: Complete project initialization with dependencies, Lefthook, NVM, and database refresh
 - `ddev project-configure`: Interactive configuration wizard for project setup
-- `ddev project-auth`: Authorize SSH keys for hosting providers
+- `ddev auth ssh`: Adds SSH keys to the ddev containers
 - `ddev project-lefthook`: Install and initialize Lefthook git hooks
 - `ddev project-nvm`: Install NVM and Node.js for theme development
 - `ddev db-refresh [env] [-f]`: Smart database refresh from hosting provider with backup age detection (12-hour threshold)
