@@ -56,9 +56,6 @@ Commands are organized into two categories:
 - `ddev pantheon-tickle`: Keep Pantheon environment awake (useful for long migrations)
 - `ddev pantheon-terminus <command>`: Run Terminus commands for Pantheon integration
 
-### Utility Commands
-- `ddev phpmyadmin`: Launch PhpMyAdmin
-
 ## Hosting Provider Support
 
 ### Pantheon

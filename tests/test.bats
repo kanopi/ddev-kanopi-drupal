@@ -25,7 +25,6 @@ health_checks() {
     # Check services are running (from DDEV add-ons)
     docker ps | grep "ddev-${PROJNAME}-redis" || docker ps | grep "ddev-${PROJNAME}-memcached" || echo "Caching service should be running"
     docker ps | grep "ddev-${PROJNAME}-solr" || echo "Solr service should be running"
-    docker ps | grep "ddev-${PROJNAME}-pma" || echo "PhpMyAdmin service should be running"
 
     echo "Checking custom commands..." >&3
     # Check new modular project commands
@@ -67,9 +66,6 @@ health_checks() {
     # Check Critical CSS commands
     ddev critical-install --help || echo "critical-install command exists or skipped due to conflicts"
     ddev critical-run --help || echo "critical-run command exists or skipped due to conflicts"
-
-    # Check utilities
-    ddev phpmyadmin --help || echo "phpmyadmin command exists or skipped due to conflicts"
 
     echo "Checking configuration files..." >&3
     # Check configuration files exist
@@ -188,7 +184,6 @@ teardown() {
     docker ps | grep "ddev-${PROJNAME}-db"
 
     # Check additional services (allow these to fail gracefully)
-    docker ps | grep "ddev-${PROJNAME}-pma" || echo "PhpMyAdmin service not running"
     docker ps | grep "ddev-${PROJNAME}-redis" || docker ps | grep "ddev-${PROJNAME}-memcached" || echo "Caching service not running"
     docker ps | grep "ddev-${PROJNAME}-solr" || echo "Solr service not running"
 }

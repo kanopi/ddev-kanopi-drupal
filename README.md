@@ -19,7 +19,7 @@ A comprehensive DDEV add-on that provides Kanopi's battle-tested workflow for Dr
 - **Theme Development** - Node.js/NPM integration with build tools
 - **E2E Testing** - Cypress integration with user management
 - **Performance Tools** - Critical CSS generation and optimization
-- **Service Integration** - PHPMyAdmin, Redis/Memcached, and Solr support
+- **Service Integration** - Redis/Memcached and Solr support
 
 ---
 
