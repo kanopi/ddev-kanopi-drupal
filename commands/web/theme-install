@@ -73,7 +73,7 @@ if [ -f "${FULL_THEME_PATH}/.nvmrc" ]; then
 else
     echo "No .nvmrc file found, using default Node.js version"
 fi
-npm install --save patch-package || echo "npm install"
+npm ci || echo "npm install"
 
 # Compile theme assets
 echo -e "🚧 ${yellow} Compiling theme assets. ${NC} 🚧"

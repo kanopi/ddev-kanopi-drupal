@@ -26,7 +26,7 @@ ddev start -y
 ddev project-lefthook
 
 # Add SSH keys for remote access.
-ddev project-auth
+ddev auth ssh
 
 # Install Composer dependencies.
 if [ -f "composer.json" ]; then

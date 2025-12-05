@@ -30,7 +30,7 @@ health_checks() {
     # Check new modular project commands
     ddev project-init --help || echo "project-init command exists or skipped due to conflicts"
     ddev project-configure --help || echo "project-configure command exists or skipped due to conflicts"
-    ddev project-auth --help || echo "project-auth command exists or skipped due to conflicts"
+    ddev auth ssh --help || echo "auth ssh command exists or skipped due to conflicts"
     ddev project-lefthook --help || echo "project-lefthook command exists or skipped due to conflicts"
     ddev project-nvm --help || echo "project-nvm command exists or skipped due to conflicts"
 
@@ -197,7 +197,7 @@ teardown() {
 
     # Test modular project commands exist and can show help
     ddev project-configure --help >/dev/null 2>&1 || echo "project-configure should exist"
-    ddev project-auth --help >/dev/null 2>&1 || echo "project-auth should exist"
+    ddev auth ssh --help >/dev/null 2>&1 || echo "auth ssh should exist"
     ddev project-lefthook --help >/dev/null 2>&1 || echo "project-lefthook should exist"
     ddev project-nvm --help >/dev/null 2>&1 || echo "project-nvm should exist"
     ddev project-init --help >/dev/null 2>&1 || echo "project-init should exist"
