@@ -10,16 +10,6 @@
 # Abort if anything fails
 set -e
 
-# Check for help flag
-if [ "$1" = "--help" ] || [ "$1" = "-h" ] || [ -z "$1" ]; then
-    echo -e "\n  📝  Remove UUIDs and _core metadata from Drupal config files."
-    echo -e "\n  🔹  Usage: ddev recipe-uuid-rm [path/to/folder]"
-    echo -e "\n  📖  Example: ddev recipe-uuid-rm config/sync"
-    echo -e "\n  🎯  This command removes uuid: and _core: lines from config files"
-    echo -e "      to prepare them for use in Drupal recipes."
-    exit 0
-fi
-
 # Change to the target directory.
 TARGET_DIR="$1"
 cd "${TARGET_DIR}" || { echo -e "\n ❌  Error: Directory '${TARGET_DIR}' not found."; exit 1; }
