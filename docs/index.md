@@ -114,6 +114,7 @@ Common customizations needed here are:
 * settings.php
 * Theme installation/build/watch commands
 * Solr settings
+* .ddev/config.yaml (make sure php_version matches your project's PHP version)
 
 See [custom-configuration.md](custom-configuration.md) for common scenarios.
 
@@ -171,3 +172,22 @@ ddev theme-watch
 # Generate a login link
 ddev drupal-uli
 ```
+## Converting Your Project from Docksal
+
+### If your project is Drupal and on Pantheon
+Add the following to `assets/pantheon_settings_defaults.inc`:
+
+```php
+/**
+* Include DDEV settings if available.
+*/
+$ddev_settings = __DIR__ . '/settings.ddev.php';
+if (file_exists($ddev_settings)) {
+include $ddev_settings;
+}
+```
+### If your project uses LeftHook
+1. Check `lefthook.yml`
+2. If there are docksal commands ("fin"), update them to be ddev commands, e.g.,
+4. Change: `run: fin composer -n code-sniff`
+7. To: `run: ddev composer -n code-sniff`
