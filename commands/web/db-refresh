@@ -59,9 +59,13 @@ elif [[ "$HOSTING_PROVIDER" == "acquia" ]]; then
   echo -e "${green}Using Acquia refresh script...${NC}"
   # Call the Acquia-specific refresh script
   bash .ddev/scripts/refresh-acquia.sh "$ENVIRONMENT" "$FORCE_BACKUP"
+elif [[ "$HOSTING_PROVIDER" == "upsun" ]]; then
+  echo -e "${green}Using Upsun refresh script...${NC}"
+  # Call the Upsun-specific refresh script
+  bash .ddev/scripts/refresh-upsun.sh "$ENVIRONMENT" "$FORCE_BACKUP"
 else
   echo -e "${red}Hosting platform '$HOSTING_PROVIDER' not supported${NC}"
-  echo -e "${yellow}Supported platforms: pantheon, acquia${NC}"
+  echo -e "${yellow}Supported platforms: pantheon, acquia, upsun${NC}"
   exit 1
 fi
 
