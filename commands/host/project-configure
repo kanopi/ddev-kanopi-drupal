@@ -96,6 +96,7 @@ CURRENT_THEMENAME=$(ddev exec printenv THEMENAME 2>/dev/null || echo "")
 CURRENT_MIGRATE_SOURCE=$(ddev exec printenv MIGRATE_DB_SOURCE 2>/dev/null || echo "")
 CURRENT_MIGRATE_ENV=$(ddev exec printenv MIGRATE_DB_ENV 2>/dev/null || echo "")
 CURRENT_APACHE_FILE_PROXY=$(ddev exec printenv APACHE_FILE_PROXY 2>/dev/null || echo "")
+CURRENT_NGINX_FILE_PROXY=$(ddev exec printenv NGINX_FILE_PROXY 2>/dev/null || echo "")
 
 # Show current configuration
 echo "📋 Current Configuration:"
@@ -115,6 +116,11 @@ case "${CURRENT_PROVIDER:-not set}" in
         echo "Acquia Environment: ${CURRENT_ENV:-not set}"
         echo "Apache File Proxy: ${CURRENT_APACHE_FILE_PROXY:-not set}"
         ;;
+    "upsun")
+        echo "Upsun Application: ${CURRENT_SITE:-not set}"
+        echo "Upsun Environment: ${CURRENT_ENV:-not set}"
+        echo "Nginx File Proxy: ${CURRENT_NGINX_FILE_PROXY:-not set}"
+        ;;
     *)
         echo "(Provider-specific settings will appear after selecting a provider)"
         ;;
@@ -127,7 +133,7 @@ echo ""
 # Get hosting provider
 echo "🏛️ Hosting Provider Configuration:"
 echo "----------------------------------"
-HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia")
+HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia", "upsun")
 echo "✓ Selected: $HOST_PROVIDER"
 
 # Get hosting-specific configuration
@@ -147,6 +153,15 @@ case "$HOST_PROVIDER" in
         echo ""
         echo "🔗 File Proxy Configuration:"
         prompt_input "Proxy URL for missing files (e.g., https://your-site.com)" "${CURRENT_APACHE_FILE_PROXY}" APACHE_FILE_PROXY
+        ;;
+    "upsun")
+        echo "🔷 Upsun Configuration:"
+        echo "-----------------------"
+        prompt_input "Application name (e.g., my-app)" "${CURRENT_SITE}" HOSTING_SITE
+        prompt_input "Default environment" "${CURRENT_ENV}" HOSTING_ENV
+        echo ""
+        echo "🔗 File Proxy Configuration:"
+        prompt_input "Proxy URL for missing files (e.g., https://your-site.com)" "${CURRENT_NGINX_FILE_PROXY}" NGINX_FILE_PROXY
         ;;
 esac
 
@@ -242,6 +257,11 @@ case "$HOST_PROVIDER" in
             write_config_var "APACHE_FILE_PROXY" "$APACHE_FILE_PROXY"
         fi
         ;;
+    "upsun")
+        if [ -n "$NGINX_FILE_PROXY" ]; then
+            write_config_var "NGINX_FILE_PROXY" "$NGINX_FILE_PROXY"
+        fi
+        ;;
 esac
 
 # Install provider-specific caching add-on
@@ -271,6 +291,16 @@ case "$HOST_PROVIDER" in
             echo "settings.ddev.memcached.php" >> .gitignore
         fi
         echo "✅ Memcached configured for Acquia"
+        ;;
+    "upsun")
+        ddev config --web-environment-add="PLATFORM_APPLICATION_NAME=drupal"
+        ddev config --web-environment-add="PLATFORM_PROJECT=${HOSITNG_SITE}"
+        ddev config --web-environment-add="PLATFORM_ENVIRONMENT=${HOSTING_ENV}"
+        if ! ddev add-on list | grep -q "ddev-platformsh"; then
+            echo "Installing Platformsh add-on Upsun..."
+            ddev add-on get ddev/ddev-platformsh
+        fi
+        echo "✅ Platform configured for Upsun"
         ;;
 esac
 
@@ -334,6 +364,15 @@ case "$HOST_PROVIDER" in
             echo "⚠️  .htaccess file not found at $HTACCESS_PATH"
         fi
         ;;
+    "upsun")
+        # Configure nginx proxy for Upsun
+        if [ -n "$NGINX_FILE_PROXY" ]; then
+            if [ ! -f ".ddev/nginx_full/nginx-site.conf" ] && [ -f ".ddev/nginx_full/nginx-site.tmpl" ] ; then
+                envsubst '${NGINX_FILE_PROXY}' < .ddev/nginx_full/nginx-site.tmpl > .ddev/nginx_full/nginx-site.conf
+                echo "✅ Updated nginx proxy to redirect to: $NGINX_FILE_PROXY"
+            fi
+        fi
+        ;;
 esac
 
 # Start DDEV with new configuration
@@ -363,6 +402,12 @@ case "$HOST_PROVIDER" in
         echo "   ddev config global --web-environment-add=ACQUIA_API_KEY=your_api_key"
         echo "   ddev config global --web-environment-add=ACQUIA_API_SECRET=your_api_secret"
         echo "   💡 Get credentials: https://cloud.acquia.com/a/profile/tokens"
+        echo ""
+        ;;
+    "upsun")
+        echo "1. 🔑 Set your Upsun API Token globally (if not already set):"
+        echo "   ddev config global --web-environment-add=PLATFORMSH_CLI_TOKEN=your_api_key"
+        echo "   💡 Get credentials: https://console.upsun.com/-/users/me/settings"
         echo ""
         ;;
 esac
