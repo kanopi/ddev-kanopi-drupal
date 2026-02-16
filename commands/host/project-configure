@@ -144,6 +144,7 @@ case "$HOST_PROVIDER" in
         echo "--------------------------"
         prompt_input "Site machine name (e.g., my-site)" "${CURRENT_SITE}" HOSTING_SITE
         prompt_input "Default environment (dev/test/live)" "${CURRENT_ENV:-dev}" HOSTING_ENV
+	NGINX_FILE_PROXY="https://${CURRENT_ENV}-${CURRENT_SITE}.pantheonsite.io"
         ;;
     "acquia")
         echo "🔷 Acquia Configuration:"
@@ -257,6 +258,7 @@ case "$HOST_PROVIDER" in
             write_config_var "APACHE_FILE_PROXY" "$APACHE_FILE_PROXY"
         fi
         ;;
+    "pantheon")
     "upsun")
         if [ -n "$NGINX_FILE_PROXY" ]; then
             write_config_var "NGINX_FILE_PROXY" "$NGINX_FILE_PROXY"
