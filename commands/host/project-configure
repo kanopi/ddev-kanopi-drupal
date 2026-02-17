@@ -297,7 +297,7 @@ case "$HOST_PROVIDER" in
         ddev config --web-environment-add="PLATFORM_APPLICATION_NAME=drupal"
         ddev config --web-environment-add="PLATFORM_PROJECT=${HOSTING_SITE}"
         ddev config --web-environment-add="PLATFORM_ENVIRONMENT=${HOSTING_ENV}"
-        if ! ddev add-on list | grep -q "ddev-platformsh"; then
+        if ! ddev add-on list --installed | grep -q "ddev-platformsh"; then
             echo "Installing Platformsh add-on Upsun..."
             ddev add-on get ddev/ddev-platformsh
         fi
@@ -312,10 +312,8 @@ case "$HOST_PROVIDER" in
     "pantheon")
         # Configure nginx proxy for Pantheon
         if [ -n "$HOSTING_SITE" ] && [ -n "$HOSTING_ENV" ]; then
-            if [ -f ".ddev/nginx_full/nginx-site.conf" ]; then
-                sed -i.bak "s/HOSTING_ENV-HOSTING_SITE/$HOSTING_ENV-$HOSTING_SITE/g" .ddev/nginx_full/nginx-site.conf
-                sed -i.bak "s/HOSTING_DOMAIN/pantheonsite.io/g" .ddev/nginx_full/nginx-site.conf
-                rm -f .ddev/nginx_full/nginx-site.conf.bak
+            if [ ! -f ".ddev/nginx_full/nginx-site.conf" ] && [ -f ".ddev/nginx_full/nginx-site.tmpl" ] ; then
+                envsubst '${NGINX_FILE_PROXY}' < .ddev/nginx_full/nginx-site.tmpl > .ddev/nginx_full/nginx-site.conf
                 echo "✅ Updated nginx proxy to redirect to: $HOSTING_ENV-$HOSTING_SITE.pantheonsite.io"
             fi
         fi
