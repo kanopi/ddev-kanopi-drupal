@@ -258,8 +258,7 @@ case "$HOST_PROVIDER" in
             write_config_var "APACHE_FILE_PROXY" "$APACHE_FILE_PROXY"
         fi
         ;;
-    "pantheon")
-    "upsun")
+    "pantheon"|"upsun")
         if [ -n "$NGINX_FILE_PROXY" ]; then
             write_config_var "NGINX_FILE_PROXY" "$NGINX_FILE_PROXY"
         fi
