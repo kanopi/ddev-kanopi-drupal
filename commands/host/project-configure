@@ -295,7 +295,7 @@ case "$HOST_PROVIDER" in
         ;;
     "upsun")
         ddev config --web-environment-add="PLATFORM_APPLICATION_NAME=drupal"
-        ddev config --web-environment-add="PLATFORM_PROJECT=${HOSITNG_SITE}"
+        ddev config --web-environment-add="PLATFORM_PROJECT=${HOSTING_SITE}"
         ddev config --web-environment-add="PLATFORM_ENVIRONMENT=${HOSTING_ENV}"
         if ! ddev add-on list | grep -q "ddev-platformsh"; then
             echo "Installing Platformsh add-on Upsun..."
