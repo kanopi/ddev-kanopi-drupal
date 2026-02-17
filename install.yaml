@@ -194,6 +194,9 @@ removal_action:
   rm -f commands/web/theme-npx 2>/dev/null || true
   rm -f commands/web/theme-watch 2>/dev/null || true
 
+  # Remove from web-entrypoint.d
+  rm -f web-entrypoint.d/replace-nginx-file-proxy.sh 2>/dev/null || true
+
   echo "✅ Custom commands removed"
 
   # Remove PHP xdebug file, scripts, and nginx config (if exists)
