@@ -39,7 +39,7 @@ fi
 ddev db-refresh
 
 # Rebuild cache
-echo "Clear cache"
+echo "Rebuild cache"
 ddev drush cr -y
 
 # Set up NVM.
