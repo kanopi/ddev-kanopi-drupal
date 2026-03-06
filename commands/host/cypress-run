@@ -1,42 +1,35 @@
 #!/usr/bin/env bash
-
-## Description: Run Cypress Commands
-## Usage: cypress-run [command]
-## Example: "ddev cypress-run [command] [URL with no http(s)://] (Defaults to DDEV URL)"
-## Aliases: cypress:run,cy,cypress,cyr
-
 #ddev-generated
+## Description: Run Cypress Commands
+## Usage: cypress-run [args]
+## Example: "ddev cypress-run run --spec cypress/e2e/test.cy.js" or "ddev cypress-run run --url https://pr-123-build.example.org"
+## RawArg: true
+## Aliases: cy,cypress,cypress-run,cyr
 
-# Abort if anything fails
 set -e
 
 # Make sure NVM works
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-CYPRESS_TESTS="tests/cypress"
+cd ${DDEV_APPROOT}/tests/cypress
+nvm use
 
-# Check if cypress directory exists
-if [ ! -d "${DDEV_APPROOT}/${CYPRESS_TESTS}" ]; then
-    echo "❌ Cypress directory not found: ${DDEV_APPROOT}/${CYPRESS_TESTS}"
-    echo "Please run 'ddev cypress-install' first to set up Cypress."
-    exit 0
-fi
+# Parse --url flag from arguments, pass everything else to cypress
+ENVIRONMENT="${DDEV_PRIMARY_URL}"
+CYPRESS_ARGS=()
 
-cd ${DDEV_APPROOT}/${CYPRESS_TESTS}
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --url)
+      ENVIRONMENT="$2"
+      shift 2
+      ;;
+    *)
+      CYPRESS_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
 
-# Check if NVM is available and .nvmrc exists
-if command -v nvm &> /dev/null && [ -f ".nvmrc" ]; then
-    nvm use
-fi
-
-# Check if cypress is installed
-if [ ! -f "./node_modules/.bin/cypress" ]; then
-    echo "❌ Cypress not installed in ${CYPRESS_TESTS}"
-    echo "Please run 'ddev cypress-install' first."
-    exit 0
-fi
-
-ENVIRONMENT=${2:-"https://$DDEV_HOSTNAME"}
-
-CYPRESS_BASE_URL="${ENVIRONMENT}" ./node_modules/.bin/cypress  "$@"
+CYPRESS_BASE_URL="${ENVIRONMENT}" ./node_modules/.bin/cypress "${CYPRESS_ARGS[@]}"
