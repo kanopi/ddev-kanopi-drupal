@@ -84,7 +84,20 @@ fi
 
 # Convert to array
 DB_ARRAY=($DATABASES)
-PRIMARY_DB=${DB_ARRAY[0]}
+
+# Find the primary database by matching APP_UUID name
+PRIMARY_DB=""
+for db in "${DB_ARRAY[@]}"; do
+  if [[ "$db" == "$APP_UUID" ]]; then
+    PRIMARY_DB="$db"
+    break
+  fi
+done
+
+if [[ -z "$PRIMARY_DB" ]]; then
+  echo -e "${yellow}Warning: No database matching APP_UUID '${APP_UUID}' found, falling back to first database${NC}"
+  PRIMARY_DB=${DB_ARRAY[0]}
+fi
 
 echo -e "${green}Found databases: ${DATABASES}${NC}"
 echo -e "${green}Primary database: ${PRIMARY_DB}${NC}"
@@ -248,11 +261,9 @@ import_database() {
 }
 
 # Import all databases
-for i in "${!DB_ARRAY[@]}"; do
-  DB_NAME=${DB_ARRAY[$i]}
-
-  if [[ $i -eq 0 ]]; then
-    # First database goes to default 'db' database
+for DB_NAME in "${DB_ARRAY[@]}"; do
+  if [[ "$DB_NAME" == "$PRIMARY_DB" ]]; then
+    # Primary database goes to default 'db' database
     import_database "$DB_NAME" "db"
   else
     # Additional databases keep their original names
@@ -275,10 +286,8 @@ update_drupal_database_settings() {
 
   # Create the database configuration block
   DB_CONFIG=""
-  for i in "${!DB_ARRAY[@]}"; do
-    DB_NAME=${DB_ARRAY[$i]}
-
-    if [[ $i -eq 0 ]]; then
+  for DB_NAME in "${DB_ARRAY[@]}"; do
+    if [[ "$DB_NAME" == "$PRIMARY_DB" ]]; then
       # Skip primary database as it's already configured as 'default'
       continue
     fi
