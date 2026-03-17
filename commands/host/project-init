@@ -38,6 +38,10 @@ fi
 # Get the DB
 ddev db-refresh
 
+# Rebuild cache
+echo "Rebuild cache"
+ddev drush cr -y
+
 # Set up NVM.
 ddev project-nvm
 

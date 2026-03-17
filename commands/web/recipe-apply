@@ -11,17 +11,6 @@
 # Abort if anything fails
 set -e
 
-# Check for help flag or no arguments
-if [ "$1" = "--help" ] || [ "$1" = "-h" ] || [ -z "$1" ]; then
-    echo -e "\n  📦  Apply a Drupal Recipe."
-    echo -e "\n  🔹  Usage: ddev recipe-apply <recipe-path>"
-    echo -e "\n  📖  Examples:"
-    echo -e "      ddev recipe-apply ../recipes/recipe-name"
-    echo -e "      ddev recipe-apply core/recipes/standard"
-    echo -e "\n  🎯  This command applies a Drupal recipe and clears cache before and after."
-    exit 0
-fi
-
 # Define the Drupal root inside DDEV
 DOCROOT_PATH="/var/www/html/${DDEV_DOCROOT}"
 
