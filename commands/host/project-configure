@@ -158,12 +158,14 @@ case "$HOST_PROVIDER" in
     "upsun")
         echo "🔷 Upsun Configuration:"
         echo "-----------------------"
-        prompt_input "Application name (e.g., my-app)" "${CURRENT_SITE}" HOSTING_SITE
-        prompt_input "Default environment" "${CURRENT_ENV}" HOSTING_ENV
+        prompt_input "Project ID (e.g., Abc1234D)" "${CURRENT_SITE}" HOSTING_SITE
+        prompt_input "Default environment (Branch hosting production) (e.g., main)" "${CURRENT_ENV}" HOSTING_ENV
         echo ""
         echo "🔗 File Proxy Configuration:"
         prompt_input "Proxy URL for missing files (e.g., https://your-site.com)" "${CURRENT_NGINX_FILE_PROXY}" NGINX_FILE_PROXY
         ;;
+
+
 esac
 
 # Get theme configuration
@@ -294,7 +296,8 @@ case "$HOST_PROVIDER" in
         echo "✅ Memcached configured for Acquia"
         ;;
     "upsun")
-        ddev config --web-environment-add="PLATFORM_APPLICATION_NAME=drupal"
+        APPLICATION_NAME=$(cat ${DDEV_APPROOT}/.platform.app.yaml | docker run -i --rm ddev/ddev-utilities yq '.name')
+        ddev config --web-environment-add="PLATFORM_APPLICATION_NAME=${APPLICATION_NAME}"
         ddev config --web-environment-add="PLATFORM_PROJECT=${HOSTING_SITE}"
         ddev config --web-environment-add="PLATFORM_ENVIRONMENT=${HOSTING_ENV}"
         if ! ddev add-on list --installed | grep -q "ddev-platformsh"; then

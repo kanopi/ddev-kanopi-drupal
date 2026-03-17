@@ -39,7 +39,7 @@ refresh_upsun_database() {
     echo -e "${green}${divider}${NC}"
     
     # Define the local database dump file path
-    DB_DUMP="/tmp/upsun_backup.${SITE_ENV}.sql.gz"
+    DB_DUMP="/tmp/upsun_backup.${ENVIRONMENT}.sql.gz"
 
     echo -e "\nChecking for local database dump file..."
 
