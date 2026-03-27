@@ -245,7 +245,7 @@ case "$HOST_PROVIDER" in
 esac
 
 echo "Ensure NVM is available"
-ddev add-on get ddev/ddev-nvms
+ddev add-on get ddev/ddev-nvm
 
 # Install provider-specific caching add-on
 echo ""
