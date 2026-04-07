@@ -1,9 +1,12 @@
 # ddev drupal kanopi config
 
+#ddev-generated
+
 # Custom configuration - ddev-generated line removed to prevent overwriting
 # If you want to take over this file and customize it, remove the line above
 # and ddev will respect it and won't overwrite the file.
 # See https://ddev.readthedocs.io/en/stable/users/extend/customization-extendibility/#custom-nginx-configuration
+
 
 server {
     listen 80 default_server;
@@ -41,7 +44,7 @@ server {
 
     # This needs to be hardcode to the environment we're proxying from as part of NGINX
     location @proxy {
-      rewrite ^/(.*)$ https://HOSTING_ENV-HOSTING_SITE.HOSTING_DOMAIN/$1;
+      rewrite ^/(.*)$ ${NGINX_FILE_PROXY}/$1;
     }
 
     # pass the PHP scripts to FastCGI server listening on socket
