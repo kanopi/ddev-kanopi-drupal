@@ -18,7 +18,7 @@ refresh_custom_database() {
     echo -e "${green}${divider}${NC}"
 
     # Define the local database dump file path
-    DB_DUMP="/tmp/db.sql"
+    DB_DUMP="${HOSTING_DB_DUMP:-/tmp/db.sql}"
     DB_DUMP_GZ="${DB_DUMP}.gz"
 
     echo -e "\nChecking for local database dump file..."
@@ -89,7 +89,7 @@ refresh_custom_database() {
         fi
 
 
-        ssh -p "${HOSTING_PORT:-22}" $HOSTING_KEY "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_OPTIONS:---gzip}"
+        ssh -p "${HOSTING_PORT:-22}" $HOSTING_KEY "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_DUMP_OPTIONS:---gzip}"
         rsync -avz -e "ssh -p ${HOSTING_PORT:-22} ${HOSTING_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}"
     else
         echo -e "\nUsing existing local database dump file."
