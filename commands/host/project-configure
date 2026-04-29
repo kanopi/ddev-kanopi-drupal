@@ -121,6 +121,16 @@ case "${CURRENT_PROVIDER:-not set}" in
         echo "Upsun Environment: ${CURRENT_ENV:-not set}"
         echo "Nginx File Proxy: ${CURRENT_NGINX_FILE_PROXY:-not set}"
         ;;
+    "custom")
+        CURRENT_HOST=$(ddev exec printenv HOSTING_HOST 2>/dev/null || echo "")
+        CURRENT_USER=$(ddev exec printenv HOSTING_USER 2>/dev/null || echo "")
+        CURRENT_PORT=$(ddev exec printenv HOSTING_PORT 2>/dev/null || echo "")
+        CURRENT_PATH=$(ddev exec printenv HOSTING_PATH 2>/dev/null || echo "")
+        echo "Hosting Host: ${CURRENT_HOST:-not set}"
+        echo "Hosting User: ${CURRENT_USER:-not set}"
+        echo "Hosting Port: ${CURRENT_PORT:-not set}"
+        echo "Hosting Path: ${CURRENT_PATH:-not set}"
+        ;;
     *)
         echo "(Provider-specific settings will appear after selecting a provider)"
         ;;
@@ -133,7 +143,7 @@ echo ""
 # Get hosting provider
 echo "🏛️ Hosting Provider Configuration:"
 echo "----------------------------------"
-HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia", "upsun")
+HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia", "upsun", "custom")
 echo "✓ Selected: $HOST_PROVIDER"
 
 # Get hosting-specific configuration
@@ -164,8 +174,17 @@ case "$HOST_PROVIDER" in
         echo "🔗 File Proxy Configuration:"
         prompt_input "Proxy URL for missing files (e.g., https://your-site.com)" "${CURRENT_NGINX_FILE_PROXY}" NGINX_FILE_PROXY
         ;;
-
-
+    "custom")
+        echo "🔷 Custom Hosting Configuration:"
+        echo "-----------------------"
+        prompt_input "Hosting Host (Host/IP)" "${CURRENT_HOST}" HOSTING_HOST
+        prompt_input "Hosting User (User to loging with)" "${CURRENT_USER}" HOSTING_USER
+        prompt_input "Hosting Port (Default: 22)" "${CURRENT_PORT}" HOSTING_PORT
+        prompt_input "Hosting Path (Default: .)" "${CURRENT_PATH}" HOSTING_PATH
+        echo ""
+        echo "🔗 File Proxy Configuration:"
+        prompt_input "Proxy URL for missing files (e.g., https://your-site.com)" "${CURRENT_NGINX_FILE_PROXY}" NGINX_FILE_PROXY
+        ;;
 esac
 
 # Get theme configuration
@@ -238,8 +257,15 @@ ddev stop
 # Write hosting provider configuration
 echo "Setting hosting provider environment variables..."
 write_config_var "HOSTING_PROVIDER" "$HOST_PROVIDER"
-write_config_var "HOSTING_SITE" "$HOSTING_SITE"
-write_config_var "HOSTING_ENV" "$HOSTING_ENV"
+if [[ "$HOST_PROVIDER" != "custom" ]]; then
+    write_config_var "HOSTING_SITE" "$HOSTING_SITE"
+    write_config_var "HOSTING_ENV" "$HOSTING_ENV"
+else
+    write_config_var "HOSTING_HOST" "$HOSTING_HOST"
+    write_config_var "HOSTING_USER" "$HOSTING_USER"
+    write_config_var "HOSTING_PORT" "$HOSTING_PORT"
+    write_config_var "HOSTING_PATH" "$HOSTING_PATH"
+fi
 
 # Write theme variables
 echo "Setting theme configuration..."
@@ -260,7 +286,7 @@ case "$HOST_PROVIDER" in
             write_config_var "APACHE_FILE_PROXY" "$APACHE_FILE_PROXY"
         fi
         ;;
-    "pantheon"|"upsun")
+    "pantheon"|"upsun"|"custom")
         if [ -n "$NGINX_FILE_PROXY" ]; then
             write_config_var "NGINX_FILE_PROXY" "$NGINX_FILE_PROXY"
         fi
@@ -369,7 +395,7 @@ case "$HOST_PROVIDER" in
             echo "⚠️  .htaccess file not found at $HTACCESS_PATH"
         fi
         ;;
-    "upsun")
+    "upsun"|"custom")
         # Configure nginx proxy for Upsun
         if [ -n "$NGINX_FILE_PROXY" ]; then
             if [ ! -f ".ddev/nginx_full/nginx-site.conf" ] && [ -f ".ddev/nginx_full/nginx-site.tmpl" ] ; then
