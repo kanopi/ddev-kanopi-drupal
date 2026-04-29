@@ -143,7 +143,7 @@ echo ""
 # Get hosting provider
 echo "🏛️ Hosting Provider Configuration:"
 echo "----------------------------------"
-HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia", "upsun", "custom")
+HOST_PROVIDER=$(select_option "Select your hosting provider:" "pantheon" "acquia" "upsun" "custom")
 echo "✓ Selected: $HOST_PROVIDER"
 
 # Get hosting-specific configuration

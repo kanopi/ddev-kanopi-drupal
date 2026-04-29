@@ -12,13 +12,14 @@ NC='\033[0m'
 divider='===================================================\n'
 
 
-# Function to refresh database from Upsun
+# Function to refresh database from a custom SSH host
 refresh_custom_database() {
-    echo -e "\n${yellow} Get database from Upsun environment: ${ENVIRONMENT}. ${NC}"
+    echo -e "\n${yellow} Get database from custom host: ${HOSTING_USER}@${HOSTING_HOST}. ${NC}"
     echo -e "${green}${divider}${NC}"
 
     # Define the local database dump file path
     DB_DUMP="/tmp/db.sql"
+    DB_DUMP_GZ="${DB_DUMP}.gz"
 
     echo -e "\nChecking for local database dump file..."
 
@@ -29,24 +30,24 @@ refresh_custom_database() {
     DOWNLOAD_NEW_BACKUP=false
 
     # Check if local dump file exists and its age
-    if [ -f "$DB_DUMP" ]; then
+    if [ -f "$DB_DUMP_GZ" ]; then
         # Get file modification time using a more reliable method
         LOCAL_FILE_TIME=""
 
         # Try different methods to get the file modification time
         if [ -z "$LOCAL_FILE_TIME" ]; then
             # Method 1: Try stat with format specifier (GNU/Linux style)
-            LOCAL_FILE_TIME=$(stat -c %Y "$DB_DUMP" 2>/dev/null)
+            LOCAL_FILE_TIME=$(stat -c %Y "$DB_DUMP_GZ" 2>/dev/null)
         fi
 
         if [ -z "$LOCAL_FILE_TIME" ]; then
             # Method 2: Try stat with format specifier (BSD/macOS style)
-            LOCAL_FILE_TIME=$(stat -f %m "$DB_DUMP" 2>/dev/null)
+            LOCAL_FILE_TIME=$(stat -f %m "$DB_DUMP_GZ" 2>/dev/null)
         fi
 
         if [ -z "$LOCAL_FILE_TIME" ]; then
             # Method 3: Use date command with file reference
-            LOCAL_FILE_TIME=$(date -r "$DB_DUMP" +%s 2>/dev/null)
+            LOCAL_FILE_TIME=$(date -r "$DB_DUMP_GZ" +%s 2>/dev/null)
         fi
 
         # Ensure we got a valid timestamp (numeric value)
@@ -73,12 +74,12 @@ refresh_custom_database() {
         echo -e "\nDownloading database backup from ${SITE_ENV}..."
 
         # Remove old dump file if it exists before downloading
-        if [ -f "$DB_DUMP" ]; then
+        if [ -f "$DB_DUMP_GZ" ]; then
             echo -e "${yellow}Removing old database dump file...${NC}"
-            rm -f "$DB_DUMP"
+            rm -f "$DB_DUMP_GZ"
         fi
 
-        if ( -z "$HOSTING_USER" ) || [ -z "$HOSTING_HOST" ]; then
+        if [ -z "$HOSTING_USER" ] || [ -z "$HOSTING_HOST" ]; then
             echo "HOSTING_USER and HOSTING_HOST variables required."
             exit 1
         fi
@@ -88,8 +89,8 @@ refresh_custom_database() {
         fi
 
 
-        ssh -p "${HOSTING_PORT:-22}" $HOSTING_KEY "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-'.'}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_OPTIONS:-'--gzip'}"
-        rsync -avz -e "ssh -p ${HOSTING_PORT:-22} ${HOSTING_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP}.gz" "${DB_DUMP}.gz"
+        ssh -p "${HOSTING_PORT:-22}" $HOSTING_KEY "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_OPTIONS:---gzip}"
+        rsync -avz -e "ssh -p ${HOSTING_PORT:-22} ${HOSTING_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}"
     else
         echo -e "\nUsing existing local database dump file."
     fi
@@ -98,7 +99,7 @@ refresh_custom_database() {
     drush sql-drop -y
 
     echo -e "\nImport DB"
-    gunzip -c ${DB_DUMP} | $(drush sql:connect)
+    gunzip -c ${DB_DUMP_GZ} | $(drush sql:connect)
 }
 
 # Main execution
