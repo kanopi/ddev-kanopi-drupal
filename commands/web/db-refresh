@@ -63,9 +63,13 @@ elif [[ "$HOSTING_PROVIDER" == "upsun" ]]; then
   echo -e "${green}Using Upsun refresh script...${NC}"
   # Call the Upsun-specific refresh script
   bash .ddev/scripts/refresh-upsun.sh "$ENVIRONMENT" "$FORCE_BACKUP"
+elif [[ "$HOSTING_PROVIDER" == "custom" ]]; then
+  echo -e "${green}Using Custom refresh script...${NC}"
+  # Call the Custom-specific refresh script
+  bash .ddev/scripts/refresh-custom.sh
 else
   echo -e "${red}Hosting platform '$HOSTING_PROVIDER' not supported${NC}"
-  echo -e "${yellow}Supported platforms: pantheon, acquia, upsun${NC}"
+  echo -e "${yellow}Supported platforms: pantheon, acquia, upsun, custom${NC}"
   exit 1
 fi
 

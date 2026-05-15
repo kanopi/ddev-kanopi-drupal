@@ -78,6 +78,31 @@ ddev add-on remove kanopi-drupal
 
 ---
 
+## 🔑 SSH Key Configuration
+
+The refresh scripts use the `HOSTING_KEY` variable to select a specific SSH key from the agent. Set it in `.ddev/config.local.yaml`:
+
+```yaml
+web_environment:
+  - HOSTING_KEY=id_ed25519
+```
+
+The value should match the **comment** on your SSH key (the scripts use `ssh-add -L | grep "$HOSTING_KEY"` to find it). By default it looks for `id_rsa`.
+
+If your key doesn't have a comment or uses a different one, you can set or update it:
+
+```bash
+ssh-keygen -c -C "id_ed25519" -f ~/.ssh/id_ed25519
+```
+
+Verify the comment is set correctly:
+
+```bash
+ssh-add -L | grep id_ed25519
+```
+
+---
+
 ## 🤝 Contributing
 
 This add-on is maintained by [Kanopi Studios](https://kanopi.com). For issues, feature requests, or contributions, please visit our [GitHub repository](https://github.com/kanopi/ddev-kanopi-drupal).
