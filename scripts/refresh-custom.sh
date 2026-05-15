@@ -84,13 +84,24 @@ refresh_custom_database() {
             exit 1
         fi
 
-        if [[ "$HOSTING_KEY" != "" ]]; then
-            HOSTING_KEY="-i ${HOSTING_KEY}"
+        # Load SSH key from agent
+        SSH_CMD="ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -p ${HOSTING_PORT:-22}"
+        TEMP_KEY="/tmp/temp_key"
+        ssh-add -L | grep "${HOSTING_KEY:-id_rsa}" > "$TEMP_KEY"
+        if eval "$SSH_CMD -i ${TEMP_KEY} ${HOSTING_USER}@${HOSTING_HOST} 'echo SSH connection successful'"; then
+            echo -e "${green}SSH connection successful.${NC}"
+        else
+            echo -e "${red}Error: Cannot connect to remote host via SSH${NC}"
+            echo -e "${red}Please ensure:${NC}"
+            echo -e "${red}1. Your SSH key is properly configured on the remote server${NC}"
+            echo -e "${red}2. SSH agent is running: ddev auth ssh${NC}"
+            echo -e "${red}3. Your key is added to the remote server's ~/.ssh/authorized_keys${NC}"
+            echo -e "${red}4. Key name is set in config.local.yaml: HOSTING_KEY=your_key_name${NC}"
+            exit 1
         fi
 
-
-        ssh -p "${HOSTING_PORT:-22}" $HOSTING_KEY "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_DUMP_OPTIONS:---gzip}"
-        rsync -avz -e "ssh -p ${HOSTING_PORT:-22} ${HOSTING_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}"
+        $SSH_CMD -i "${TEMP_KEY}" "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_DUMP_OPTIONS:---gzip}"
+        rsync -avz -e "${SSH_CMD} -i ${TEMP_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}"
     else
         echo -e "\nUsing existing local database dump file."
     fi
