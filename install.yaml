@@ -169,6 +169,9 @@ removal_action:
   rm -f commands/host/cypress-install 2>/dev/null || true
   rm -f commands/host/cypress-run 2>/dev/null || true
   rm -f commands/host/cypress-users 2>/dev/null || true
+  rm -f commands/host/playwright-install 2>/dev/null || true
+  rm -f commands/host/playwright-run 2>/dev/null || true
+  rm -f commands/host/playwright-users 2>/dev/null || true
   rm -f commands/host/db-rebuild 2>/dev/null || true
   rm -f commands/host/drupal-uli 2>/dev/null || true
   rm -f commands/host/pantheon-terminus 2>/dev/null || true

@@ -1,6 +1,6 @@
 # Command Reference
 
-The DDEV Kanopi Drupal Add-on provides custom commands to streamline local development, testing, and hosting integration.
+The DDEV Kanopi Drupal Add-on provides 30 custom commands to streamline local development, testing, and hosting integration.
 
 **Types**
 
@@ -21,6 +21,9 @@ The DDEV Kanopi Drupal Add-on provides custom commands to streamline local devel
 | `cypress-install`  | Install the node packages for cypress on the developers local machine     | `ddev cypress-install`                     | `cypress:install`, `cyi`, `install-cypress`              | Host |
 | `cypress-run`      | Run Cypress Commands                                                      | `ddev cypress-run [command]`               | `cypress:run`, `cy`, `cypress`, `cyr`                    | Host |
 | `cypress-users`    | Create Cypress users                                                      | `ddev cypress-users`                       | `cypress:users`, `cyu`                                   | Host |
+| `playwright-install` | Install Playwright and browsers for e2e testing                         | `ddev playwright-install`                  | `playwright:install`, `pwi`                              | Host |
+| `playwright-run [options]` | Run Playwright e2e tests                                          | `ddev playwright-run --ui`                 | `playwright:run`, `pwr`                                  | Host |
+| `playwright-users` | Create Playwright test users in Drupal                                    | `ddev playwright-users`                    | `playwright:users`, `pwu`                                | Host |
 | `db-prep-migrate`  | Create and configure the migration database inside the DDEV web container | `ddev db-prep-migrate`                     | `db:prep-migrate`, `migrate-prep-db`                     | Web  |
 | `db-rebuild`       | Runs composer install and database refresh.                               | `ddev db-rebuild`                          | `db:rebuild`, `rebuild`, `dbreb`                         | Host |
 | `db-refresh`       | Downloads the database from the hosting provider (Pantheon & Acquia).     | `ddev db-refresh pr-123`                   | `db:refresh`, `refresh`                                  | Web  |

@@ -12,12 +12,12 @@ A comprehensive DDEV add-on that provides Kanopi's battle-tested workflow for Dr
 
 ## ✨ Features
 
-- **27+ Custom Commands** - Complete Drupal development workflow
+- **30+ Custom Commands** - Complete Drupal development workflow
 - **Multi-Provider Hosting** - Pantheon and Acquia support
 - **Smart Database Refresh** - 12-hour backup age detection
 - **Recipe Development** - Drupal 11 recipe creation and management
 - **Theme Development** - Node.js/NPM integration with build tools
-- **E2E Testing** - Cypress integration with user management
+- **E2E Testing** - Cypress and Playwright integration with user management
 - **Performance Tools** - Critical CSS generation and optimization
 - **Service Integration** - Redis/Memcached and Solr support
 

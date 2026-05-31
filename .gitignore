@@ -21,3 +21,6 @@ test/test-install/
 test/test-manual/
 
 .claude*
+!.claude/
+!.claude/plans/
+!.claude/plans/**
