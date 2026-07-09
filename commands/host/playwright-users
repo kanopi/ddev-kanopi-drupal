@@ -12,25 +12,32 @@ set -e
 
 echo "Creating test users for Playwright tests..."
 
+# user-create is a no-op if the account already exists (e.g. after db-refresh),
+# so always reset the password afterwards to keep credentials predictable.
+
 # Admin user — administrator role is always present in Drupal
 ddev drush user-create playwright --mail="playwright@test.local" --password="playwright" || true
+ddev drush user-password playwright "playwright" || true
 ddev drush user-add-role administrator playwright
 echo "Created/updated admin user: playwright / playwright"
 
 # Editor user — 'editor' role must exist in the project; adjust machine name if needed
 ddev drush user-create playwright-editor --mail="playwright-editor@test.local" --password="playwright" || true
+ddev drush user-password playwright-editor "playwright" || true
 ddev drush user-add-role editor playwright-editor 2>/dev/null \
     || echo "  Note: 'editor' role not found — adjust the role machine name for your project"
 echo "Created/updated editor user: playwright-editor / playwright"
 
 # Author user — adjust role machine name to match your project
 ddev drush user-create playwright-author --mail="playwright-author@test.local" --password="playwright" || true
+ddev drush user-password playwright-author "playwright" || true
 ddev drush user-add-role content_author playwright-author 2>/dev/null \
     || echo "  Note: 'content_author' role not found — adjust the role machine name for your project"
 echo "Created/updated author user: playwright-author / playwright"
 
 # Authenticated-only user — all logged-in Drupal users already have the 'authenticated' role
 ddev drush user-create playwright-subscriber --mail="playwright-subscriber@test.local" --password="playwright" || true
+ddev drush user-password playwright-subscriber "playwright" || true
 echo "Created/updated authenticated user: playwright-subscriber / playwright"
 
 echo ""
