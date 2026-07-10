@@ -6,6 +6,7 @@
 ## Example: "ddev playwright-run --reporter=list"
 ## Example: "ddev playwright-run --ui"
 ## Example: "ddev playwright-run tests/e2e/specs/smoke.spec.ts"
+## Example: "ALL_BROWSERS=1 ddev playwright-run"
 ## Aliases: playwright:run,pwr
 
 #ddev-generated
@@ -29,7 +30,8 @@ if [ ! -f "${DDEV_APPROOT}/playwright.config.ts" ] && [ ! -f "${DDEV_APPROOT}/pl
     exit 1
 fi
 
-export BASE_URL="${DDEV_PRIMARY_URL}"
+# Target the running DDEV site unless the caller already set BASE_URL.
+export BASE_URL="${BASE_URL:-${DDEV_PRIMARY_URL}}"
 export DRUPAL_USERNAME="playwright"
 export DRUPAL_PASSWORD="playwright"
 
@@ -39,8 +41,12 @@ echo -e "🎭 ${yellow} Running Playwright tests against ${BASE_URL}...${NC}"
 echo -e "${green}${divider}${NC}"
 
 npx playwright test "$@"
+STATUS=$?
 
 if [ -d "playwright-report" ]; then
     echo ""
     echo "View HTML report with: npx playwright show-report"
 fi
+
+# Propagate the test exit code so lefthook/CI and scripting see failures.
+exit $STATUS
