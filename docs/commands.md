@@ -35,7 +35,6 @@ The DDEV Kanopi Drupal Add-on provides 30 custom commands to streamline local de
 | `auth ssh`         | Adds SSH keys to the ddev containers.                                     | `ddev auth ssh`                            | —                                                        | Host |
 | `project-configure`| Interactive configuration wizard for Kanopi Drupal DDEV                   | `ddev project-configure`                   | `configure`, `project:configure`, `prc`                  | Host |
 | `project-init`     | Initialize local development.                                             | `ddev project-init`                        | `project:init`, `init`                                   | Host |
-| `project-lefthook` | Initialize Lefthook.                                                      | `ddev project-lefthook`                    | `project:lefthook`                                       | Host |
 | `project-nvm`      | Initializes NVM.                                                          | `ddev project-nvm`                         | `project:nvm`                                            | Host |
 | `recipe-apply`     | Apply a Drupal Recipe.                                                    | `ddev recipe-apply ../recipes/recipe-name` | `recipe:apply`, `recipe`, `ra`                           | Web  |
 | `recipe-unpack`    | Unpack a recipe package that's already required in your project           | `ddev recipe-unpack drupal/example_recipe` | `recipe:unpack`, `ru`                                    | Web  |

@@ -21,10 +21,9 @@ Commands are organized into two categories:
 ## Common Development Commands
 
 ### Essential Commands
-- `ddev project-init`: Complete project initialization with dependencies, Lefthook, NVM, and database refresh
+- `ddev project-init`: Complete project initialization with dependencies, NVM, and database refresh
 - `ddev project-configure`: Interactive configuration wizard for project setup
 - `ddev auth ssh`: Adds SSH keys to the ddev containers
-- `ddev project-lefthook`: Install and initialize Lefthook git hooks
 - `ddev project-nvm`: Install NVM and Node.js for theme development
 - `ddev db-refresh [env] [-f]`: Smart database refresh from hosting provider with backup age detection (12-hour threshold)
 - `ddev db-rebuild`: Composer install followed by database refresh
@@ -216,7 +215,6 @@ bats tests/test.bats --filter "install from directory"
 ## Dependencies
 
 The add-on automatically installs and configures:
-- **Lefthook** for git hooks
 - **NVM** for Node.js version management
 - **Cypress** for E2E testing
 - **Terminus** for Pantheon API access (when using Pantheon)

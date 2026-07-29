@@ -26,6 +26,12 @@ pre_install_actions:
 post_install_actions:
 
 - |
+  #ddev-description: Clean up the removed Lefthook command
+  # project-lefthook no longer ships with this add-on. Installing over an older
+  # version leaves the old command file behind, so remove it explicitly.
+  rm -f commands/host/project-lefthook 2>/dev/null || true
+
+- |
   #ddev-description: Configure environment variables for CI
   # Auto-configure environment variables for CI and testing environments
   if [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ] || [ "${DDEV_NONINTERACTIVE:-}" = "true" ]; then
@@ -178,6 +184,7 @@ removal_action:
   rm -f commands/host/pantheon-testenv 2>/dev/null || true
   rm -f commands/host/project-configure 2>/dev/null || true
   rm -f commands/host/project-init 2>/dev/null || true
+  # Retained so uninstalling also clears the command from pre-removal installs.
   rm -f commands/host/project-lefthook 2>/dev/null || true
   rm -f commands/host/project-nvm 2>/dev/null || true
 
