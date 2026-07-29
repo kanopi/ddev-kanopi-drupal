@@ -48,5 +48,5 @@ if [ -d "playwright-report" ]; then
     echo "View HTML report with: npx playwright show-report"
 fi
 
-# Propagate the test exit code so lefthook/CI and scripting see failures.
+# Propagate the test exit code so CI and scripting see failures.
 exit $STATUS
