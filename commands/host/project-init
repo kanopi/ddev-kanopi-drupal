@@ -22,9 +22,6 @@ echo -e "🚀 ${yellow} Initializing the Project.${NC} 🚀"
 echo -e "${green}${divider}${NC}"
 ddev start -y
 
-# Set up Lefthook.
-ddev project-lefthook
-
 # Add SSH keys for remote access.
 ddev auth ssh
 

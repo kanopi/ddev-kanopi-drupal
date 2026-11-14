@@ -186,8 +186,3 @@ if (file_exists($ddev_settings)) {
 include $ddev_settings;
 }
 ```
-### If your project uses LeftHook
-1. Check `lefthook.yml`
-2. If there are docksal commands ("fin"), update them to be ddev commands, e.g.,
-4. Change: `run: fin composer -n code-sniff`
-7. To: `run: ddev composer -n code-sniff`
