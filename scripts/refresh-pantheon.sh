@@ -169,14 +169,15 @@ refresh_pantheon_database() {
 
     echo -e "\nImport DB"
     # Pantheon's automatic nightly backups are dumped with --master-data, so they
-    # contain replication metadata (CHANGE MASTER TO / SET GLOBAL gtid_slave_pos).
+    # contain replication metadata (CHANGE MASTER TO / SET GLOBAL gtid_slave_pos;
+    # MySQL 8.0.23+ spells the former CHANGE REPLICATION SOURCE TO).
     # Applying those requires SUPER or REPLICATION SLAVE ADMIN, which the local
     # DDEV db user does not have, so mysql aborts with:
     #   ERROR 1227 (42000) at line 22: Access denied; you need (at least one of)
     #   the SUPER, REPLICATION SLAVE ADMIN privilege(s) for this operation
     # Every table after that statement is then silently skipped. Strip them.
     gunzip -c ${DB_DUMP} \
-      | sed -e '/^CHANGE MASTER TO/d' -e '/^SET GLOBAL gtid_slave_pos/d' \
+      | sed -E -e '/^CHANGE (MASTER|REPLICATION SOURCE) TO/d' -e '/^SET GLOBAL gtid_slave_pos/d' \
       | $(drush sql:connect)
 }
 
