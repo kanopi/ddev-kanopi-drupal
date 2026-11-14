@@ -37,6 +37,12 @@ server {
         rewrite ^ /index.php;
     }
 
+    # Drupal builds CSS/JS aggregates on first request, so they must reach
+    # Drupal rather than the remote proxy.
+    location ~ ^/sites/[^/]+/files/(css|js)/ {
+      try_files $uri /index.php?$query_string;
+    }
+
     # Setup files proxy
     location ~ ^/sites/[^/]+/files/.* {
       try_files $uri @rewrite @proxy;
