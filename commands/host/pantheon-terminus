@@ -4,7 +4,7 @@
 ##
 ## Usage: pantheon-terminus <command> [args...]
 ##        ddev pantheon-terminus site:list
-##        ddev pantheon-terminus backup:create site.env --element=database --keep=180
+##        ddev pantheon-terminus backup:create site.env --element=database --keep-for=180
 ##        ddev pantheon-terminus backup:get site.env --element=database
 ## Aliases: pantheon:terminus,terminus
 
