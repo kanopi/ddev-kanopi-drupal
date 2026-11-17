@@ -138,7 +138,7 @@ refresh_pantheon_database() {
 
     if [ "$CREATE_NEW_BACKUP" = true ]; then
         echo -e "${yellow}Creating new backup for ${SITE_ENV}...${NC}"
-        if terminus backup:create ${SITE_ENV} --element=database -y; then
+        if terminus backup:create ${SITE_ENV} --element=database --keep-for=180 -y; then
             echo -e "${green}Backup created successfully.${NC}"
             # Wait a moment for the backup to be processed
             echo "Waiting for backup to complete..."

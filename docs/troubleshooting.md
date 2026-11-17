@@ -94,7 +94,7 @@ ddev db-refresh -f
 ddev exec env | grep -E "(HOSTING|TERMINUS|ACQUIA)"
 
 # Manual backup download (Pantheon)
-ddev pantheon-terminus backup:create my-site.dev --element=database
+ddev pantheon-terminus backup:create my-site.dev --element=database --keep-for=180
 ddev pantheon-terminus backup:get my-site.dev --element=database --to=/tmp/backup.sql.gz
 ```
 
