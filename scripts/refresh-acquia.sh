@@ -15,6 +15,9 @@ divider='===================================================\n'
 ENVIRONMENT=${1:-prod}
 FORCE_REFRESH=${2:-false}
 
+# Make `gunzip | mysql` fail when either side fails, not only mysql.
+set -o pipefail
+
 echo -e "${green}${divider}${NC}"
 echo -e "${green}Refreshing database from Acquia ${ENVIRONMENT} environment${NC}"
 if [[ "$FORCE_REFRESH" == "true" ]]; then
@@ -184,6 +187,7 @@ create_backup_if_needed() {
 import_database() {
   local DB_NAME=$1
   local TARGET_DB=$2
+  local IMPORT_FAILED=false
 
   echo -e "${yellow}Processing database: ${DB_NAME} -> ${TARGET_DB}${NC}"
 
@@ -234,9 +238,9 @@ import_database() {
 
     # Import the database backup
     if [[ "$BACKUP_FILE" == *.gz ]]; then
-      gunzip -c "${BACKUP_FILE}" | mysql db
+      gunzip -c "${BACKUP_FILE}" | mysql db || IMPORT_FAILED=true
     else
-      mysql db < "${BACKUP_FILE}"
+      mysql db < "${BACKUP_FILE}" || IMPORT_FAILED=true
     fi
   else
     # Secondary databases get their own named database
@@ -247,15 +251,20 @@ import_database() {
 
     # Import the database backup to the named database
     if [[ "$BACKUP_FILE" == *.gz ]]; then
-      gunzip -c "${BACKUP_FILE}" | mysql "${TARGET_DB}"
+      gunzip -c "${BACKUP_FILE}" | mysql "${TARGET_DB}" || IMPORT_FAILED=true
     else
-      mysql "${TARGET_DB}" < "${BACKUP_FILE}"
+      mysql "${TARGET_DB}" < "${BACKUP_FILE}" || IMPORT_FAILED=true
     fi
   fi
 
   # Clean up the downloaded file
   echo -e "${yellow}Cleaning up temporary backup file: ${BACKUP_FILE}${NC}"
   rm -f "${BACKUP_FILE}"
+
+  if [[ "$IMPORT_FAILED" == "true" ]]; then
+    echo -e "${red}Error: Database import failed for ${DB_NAME}. The database may be incomplete.${NC}"
+    return 1
+  fi
 
   echo -e "${green}Database ${DB_NAME} import completed successfully!${NC}"
 }
@@ -264,10 +273,17 @@ import_database() {
 for DB_NAME in "${DB_ARRAY[@]}"; do
   if [[ "$DB_NAME" == "$PRIMARY_DB" ]]; then
     # Primary database goes to default 'db' database
-    import_database "$DB_NAME" "db"
+    TARGET_DB="db"
   else
     # Additional databases keep their original names
-    import_database "$DB_NAME" "$DB_NAME"
+    TARGET_DB="$DB_NAME"
+  fi
+
+  # Stop before composer install, updatedb, and config:import run against a
+  # database that failed to download or import.
+  if ! import_database "$DB_NAME" "$TARGET_DB"; then
+    echo -e "${red}Database refresh from Acquia failed.${NC}"
+    exit 1
   fi
 done
 

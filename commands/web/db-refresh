@@ -73,4 +73,12 @@ else
   exit 1
 fi
 
+# The provider scripts run in a child shell, so an `exit 1` inside one only
+# ends that shell. Propagate its status instead of reporting success.
+REFRESH_STATUS=$?
+if [ "$REFRESH_STATUS" -ne 0 ]; then
+  echo -e "\n${red}Database refresh failed (exit status ${REFRESH_STATUS}). See the errors above.${NC}"
+  exit "$REFRESH_STATUS"
+fi
+
 echo -e "\n${green}Database refresh completed successfully!${NC}"
