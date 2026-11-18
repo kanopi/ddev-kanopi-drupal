@@ -73,12 +73,6 @@ refresh_custom_database() {
     if [ "$DOWNLOAD_NEW_BACKUP" = true ]; then
         echo -e "\nDownloading database backup from ${SITE_ENV}..."
 
-        # Remove old dump file if it exists before downloading
-        if [ -f "$DB_DUMP_GZ" ]; then
-            echo -e "${yellow}Removing old database dump file...${NC}"
-            rm -f "$DB_DUMP_GZ"
-        fi
-
         if [ -z "$HOSTING_USER" ] || [ -z "$HOSTING_HOST" ]; then
             echo "HOSTING_USER and HOSTING_HOST variables required."
             exit 1
@@ -100,17 +94,36 @@ refresh_custom_database() {
             exit 1
         fi
 
-        $SSH_CMD -i "${TEMP_KEY}" "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_DUMP_OPTIONS:---gzip}"
-        rsync -avz -e "${SSH_CMD} -i ${TEMP_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}"
+        if ! $SSH_CMD -i "${TEMP_KEY}" "${HOSTING_USER}@${HOSTING_HOST}" "cd ${HOSTING_PATH:-.}; ${HOSTING_DRUSH:-vendor/bin/drush} sql:dump --result-file=${DB_DUMP} --extra-dump=\"--disable-ssl --no-tablespaces\" ${HOSTING_DB_DUMP_OPTIONS:---gzip}"; then
+            echo -e "${red}Failed to create the database dump on the remote host. The local database was not changed.${NC}"
+            exit 1
+        fi
+
+        # Download to a temporary file so a failed download never leaves the
+        # local database dropped with nothing to import.
+        rm -f "${DB_DUMP_GZ}.part"
+        if ! rsync -avz -e "${SSH_CMD} -i ${TEMP_KEY}" --remove-source-files "${HOSTING_USER}@${HOSTING_HOST}:${DB_DUMP_GZ}" "${DB_DUMP_GZ}.part" || ! gzip -t "${DB_DUMP_GZ}.part"; then
+            rm -f "${DB_DUMP_GZ}.part"
+            echo -e "${red}Failed to download a valid database dump. The local database was not changed.${NC}"
+            exit 1
+        fi
+        mv -f "${DB_DUMP_GZ}.part" "$DB_DUMP_GZ"
     else
         echo -e "\nUsing existing local database dump file."
     fi
 
     echo -e "\nReset DB"
-    drush sql-drop -y
+    if ! drush sql-drop -y; then
+        echo -e "${red}Failed to drop the local database.${NC}"
+        exit 1
+    fi
 
     echo -e "\nImport DB"
-    gunzip -c ${DB_DUMP_GZ} | $(drush sql:connect)
+    set -o pipefail
+    if ! gunzip -c ${DB_DUMP_GZ} | $(drush sql:connect); then
+        echo -e "${red}Database import failed. The local database may be incomplete.${NC}"
+        exit 1
+    fi
 }
 
 # Main execution

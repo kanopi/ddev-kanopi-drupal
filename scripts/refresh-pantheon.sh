@@ -143,6 +143,9 @@ refresh_pantheon_database() {
             # Wait a moment for the backup to be processed
             echo "Waiting for backup to complete..."
             sleep 10
+        elif [ "$FORCE_BACKUP" != true ] && [ -n "$LATEST_BACKUP_TIMESTAMP" ]; then
+            # An older backup is still better than no refresh at all.
+            echo -e "${yellow}Failed to create a new backup for ${SITE_ENV}. Falling back to the latest existing backup (${BACKUP_AGE_HOURS} hours old).${NC}"
         else
             echo -e "${red}Failed to create backup for ${SITE_ENV}. Exiting.${NC}"
             exit 1
@@ -153,21 +156,27 @@ refresh_pantheon_database() {
     if [ "$DOWNLOAD_NEW_BACKUP" = true ]; then
       echo -e "\nDownloading database backup from ${SITE_ENV}..."
 
-      # Remove old dump file if it exists before downloading
-      if [ -f "$DB_DUMP" ]; then
-          echo -e "${yellow}Removing old database dump file...${NC}"
-          rm -f "$DB_DUMP"
+      # Download to a temporary file so a failed download never leaves the
+      # local database dropped with nothing to import.
+      rm -f "${DB_DUMP}.part"
+      if ! terminus backup:get ${SITE_ENV} --element=database --to="${DB_DUMP}.part" || ! gzip -t "${DB_DUMP}.part"; then
+          rm -f "${DB_DUMP}.part"
+          echo -e "${red}Failed to download a valid database backup from ${SITE_ENV}. The local database was not changed.${NC}"
+          exit 1
       fi
-
-      terminus backup:get ${SITE_ENV} --element=database --to=${DB_DUMP}
+      mv -f "${DB_DUMP}.part" "$DB_DUMP"
     else
       echo -e "\nUsing existing local database dump file."
     fi
 
     echo -e "\nReset DB"
-    drush sql-drop -y
+    if ! drush sql-drop -y; then
+        echo -e "${red}Failed to drop the local database.${NC}"
+        exit 1
+    fi
 
     echo -e "\nImport DB"
+    set -o pipefail
     # Pantheon's automatic nightly backups are dumped with --master-data, so they
     # contain replication metadata (CHANGE MASTER TO / SET GLOBAL gtid_slave_pos;
     # MySQL 8.0.23+ spells the former CHANGE REPLICATION SOURCE TO).
@@ -176,9 +185,12 @@ refresh_pantheon_database() {
     #   ERROR 1227 (42000) at line 22: Access denied; you need (at least one of)
     #   the SUPER, REPLICATION SLAVE ADMIN privilege(s) for this operation
     # Every table after that statement is then silently skipped. Strip them.
-    gunzip -c ${DB_DUMP} \
+    if ! gunzip -c ${DB_DUMP} \
       | sed -E -e '/^CHANGE (MASTER|REPLICATION SOURCE) TO/d' -e '/^SET GLOBAL gtid_slave_pos/d' \
-      | $(drush sql:connect)
+      | $(drush sql:connect); then
+        echo -e "${red}Database import failed. The local database may be incomplete.${NC}"
+        exit 1
+    fi
 }
 
 # Main execution

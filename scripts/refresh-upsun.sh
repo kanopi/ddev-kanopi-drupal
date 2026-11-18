@@ -99,22 +99,31 @@ refresh_upsun_database() {
     if [ "$DOWNLOAD_NEW_BACKUP" = true ]; then
       echo -e "\nDownloading database backup from ${SITE_ENV}..."
 
-      # Remove old dump file if it exists before downloading
-      if [ -f "$DB_DUMP" ]; then
-          echo -e "${yellow}Removing old database dump file...${NC}"
-          rm -f "$DB_DUMP"
+      # Download to a temporary file so a failed download never leaves the
+      # local database dropped with nothing to import.
+      rm -f "${DB_DUMP}.part"
+      if ! platform db:dump -e ${ENVIRONMENT} --gzip -f "${DB_DUMP}.part" || ! gzip -t "${DB_DUMP}.part"; then
+          rm -f "${DB_DUMP}.part"
+          echo -e "${red}Failed to download a valid database dump from ${ENVIRONMENT}. The local database was not changed.${NC}"
+          exit 1
       fi
-
-      platform db:dump -e ${ENVIRONMENT} --gzip -f ${DB_DUMP}
+      mv -f "${DB_DUMP}.part" "$DB_DUMP"
     else
       echo -e "\nUsing existing local database dump file."
     fi
 
     echo -e "\nReset DB"
-    drush sql-drop -y
+    if ! drush sql-drop -y; then
+        echo -e "${red}Failed to drop the local database.${NC}"
+        exit 1
+    fi
 
     echo -e "\nImport DB"
-    gunzip -c ${DB_DUMP} | $(drush sql:connect)
+    set -o pipefail
+    if ! gunzip -c ${DB_DUMP} | $(drush sql:connect); then
+        echo -e "${red}Database import failed. The local database may be incomplete.${NC}"
+        exit 1
+    fi
 }
 
 # Main execution
